@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="stylesheet" href="styles.css"/>
+    <title>Cards | Project 1</title>
+</head>
+<body>
+<div class="cards">
+    <div class="card" style="background-image: url('https://loremflickr.com/1024/768');">
+        <h3>Lorem Flickr</h3>
+    </div>
+    <div class="card" style="background-image: url('https://loremflickr.com/1024/768');">
+        <h3>Lorem Flickr</h3>
+    </div>
+    <div class="card" style="background-image: url('https://loremflickr.com/1024/768');">
+        <h3>Lorem Flickr</h3>
+    </div>
+    <div class="card" style="background-image: url('https://loremflickr.com/1024/768');">
+        <h3>Lorem Flickr</h3>
+    </div>
+    <div class="card" style="background-image: url('https://loremflickr.com/1024/768');">
+        <h3>Lorem Flickr</h3>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+<script>
+    $(function () {
+        var $card = $('.card');
+        $card.click(function (e) {
+            $card.removeClass('active');
+            $(this).addClass('active');
+            // e.target
+        })
+    })
+</script>
+</body>
+</html>
