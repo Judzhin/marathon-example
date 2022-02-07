@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"/>
+    <link rel="stylesheet" href="style.css"/>
+    <title>Слайдер | Проект 3</title>
+</head>
+<body>
+<div class="container">
+    <div class="sidebar">
+        <div style="background: linear-gradient(229.99deg, #343b3b -26%, #01160d 145%);">
+            <h1>GT-R</h1>
+            <p>Love, death & robots</p>
+        </div>
+        <div style="background: linear-gradient(215.32deg, #506066 -1%, #02131c 124%);">
+            <h1>Mercedes</h1>
+            <p>Love, death & robots</p>
+        </div>
+        <div style="background: linear-gradient(221.87deg, #1f1201 1%, #80570e 128%);">
+            <h1>Audi R8</h1>
+            <p>Love, death & robots</p>
+        </div>
+        <div style="background: linear-gradient(220.16deg, #09090b -8%, #262c3a 138%);">
+            <h1>Chevy Camaro</h1>
+            <p>Love, death & robots</p>
+        </div>
+    </div>
+    <div class="main-slide">
+        <div style="background-image: url('https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1583&q=80');"></div>
+        <div style="background-image: url('https://images.unsplash.com/photo-1493238792000-8113da705763?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80');"></div>
+        <div style="background-image: url('https://images.unsplash.com/photo-1612368764459-0446df792e36?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80');"></div>
+        <div style="background-image: url('https://images.unsplash.com/photo-1619330193424-e6a670798b9e?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80');"></div>
+    </div>
+    <div class="controls">
+        <button class="down-button">
+            <i class="fas fa-arrow-down"></i>
+        </button>
+        <button class="up-button">
+            <i class="fas fa-arrow-up"></i>
+        </button>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+<script>
+    let Slider = (function ($) {
+        let defaultOptions = {},
+            slidesCount = 0,
+            activeSlideIndex = 0;
+
+        let SlideContainer = function (options) {
+            this.$options = $.extend({}, this.DEFAULTS, options);
+            this.$handler = $(this.$options['handler']);
+            this.$sidebar = $(this.$options['sidebar']['handler'], this.$handler);
+            this.$mainSlide = $(this.$options['mainSlide']['handler'], this.$handler);
+            slidesCount = this.$mainSlide.children().length;
+            this.$sidebar.css('top', `-${(slidesCount - 1) * 100}vh`);
+            this.controls = new SlideControl(this.$options['controls'], this);
+            this.controls.on('control:handler', $.proxy(this.handler, this))
+        }
+
+        SlideContainer.prototype = {
+            DEFAULTS: {
+                handler: '.container',
+                sidebar: {
+                    handler: '.sidebar'
+                },
+                mainSlide: {
+                    handler: '.main-slide'
+                },
+            },
+            height: function () {
+                return this.$handler.height();
+            },
+            handler: function () {
+                this.$sidebar.css({
+                    transform: `translateY(${activeSlideIndex * this.height()}px)`
+                });
+                this.$mainSlide.css({
+                    transform: `translateY(-${activeSlideIndex * this.height()}px)`
+                });
+            }
+        }
+
+        let SlideControl = function (options, context) {
+            this.$event = $(this);
+            this.$options = $.extend(defaultOptions, this.DEFAULTS, options);
+            this.$downControl = $(this.$options['down']['handler'], context.$handler);
+            this.$upControl = $(this.$options['up']['handler'], context.$handler);
+            this.context = context;
+            this.events();
+        }
+
+        SlideControl.prototype = {
+            DEFAULTS: {
+                up: {
+                    handler: '.up-button'
+                },
+                down: {
+                    handler: '.down-button'
+                }
+            },
+            events: function () {
+                this.$downControl.on('click', $.proxy(this.onDownClick, this));
+                this.$upControl.on('click', $.proxy(this.onUpClick, this));
+            },
+            onDownClick: function () {
+                activeSlideIndex--;
+                if (activeSlideIndex < 0) {
+                    activeSlideIndex = slidesCount - 1;
+                }
+                this.$event.trigger('control:handler', []);
+            },
+            onUpClick: function () {
+                activeSlideIndex++;
+                if (activeSlideIndex === slidesCount) {
+                    activeSlideIndex = 0;
+                }
+                this.$event.trigger('control:handler', []);
+            },
+            on: function (name, callback) {
+                this.$event.on(name, callback);
+            },
+        };
+
+        return {
+            DEFAULTS: {},
+
+            /**
+             *
+             * @param options
+             */
+            ready: function (options) {
+                this.$options = $.extend(defaultOptions, this.DEFAULTS, options);
+                this.container = new SlideContainer(this.$options);
+            }
+        }
+    }).call(this, jQuery);
+
+    Slider.ready({
+        // handler: '.container',
+        // sidebar: {
+        //     handler: '.sidebar'
+        // },
+        // mainSlide: {
+        //     handler: '.main-slide'
+        // },
+        // controls: {
+        //     up: {
+        //         handler: '.up-button'
+        //     },
+        //     down: {
+        //         handler: '.down-button'
+        //     }
+        // }
+    })
+</script>
+</body>
+</html>
