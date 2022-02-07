@@ -50,43 +50,9 @@
             slidesCount = 0,
             activeSlideIndex = 0;
 
-        let SlideContainer = function (options) {
-            this.$options = $.extend({}, this.DEFAULTS, options);
-            this.$handler = $(this.$options['handler']);
-            this.$sidebar = $(this.$options['sidebar']['handler'], this.$handler);
-            this.$mainSlide = $(this.$options['mainSlide']['handler'], this.$handler);
-            slidesCount = this.$mainSlide.children().length;
-            this.$sidebar.css('top', `-${(slidesCount - 1) * 100}vh`);
-            this.controls = new SlideControl(this.$options['controls'], this);
-            this.controls.on('control:handler', $.proxy(this.handler, this))
-        }
-
-        SlideContainer.prototype = {
-            DEFAULTS: {
-                handler: '.container',
-                sidebar: {
-                    handler: '.sidebar'
-                },
-                mainSlide: {
-                    handler: '.main-slide'
-                },
-            },
-            height: function () {
-                return this.$handler.height();
-            },
-            handler: function () {
-                this.$sidebar.css({
-                    transform: `translateY(${activeSlideIndex * this.height()}px)`
-                });
-                this.$mainSlide.css({
-                    transform: `translateY(-${activeSlideIndex * this.height()}px)`
-                });
-            }
-        }
-
         let SlideControl = function (options, context) {
             this.$event = $(this);
-            this.$options = $.extend(defaultOptions, this.DEFAULTS, options);
+            this.$options = $.extend({}, this.DEFAULTS, options);
             this.$downControl = $(this.$options['down']['handler'], context.$handler);
             this.$upControl = $(this.$options['up']['handler'], context.$handler);
             this.context = context;
@@ -124,6 +90,56 @@
                 this.$event.on(name, callback);
             },
         };
+
+        let SlidePanel = function (options, context) {
+            this.$options = $.extend({}, this.DEFAULTS, options);
+            this.$handler = $(this.$options['handler'], context.$handler);
+        }
+
+        SlidePanel.prototype = {
+            css: function (key, value) {
+                return this.$handler.css(key, value);
+            },
+            transform: function (length) {
+                this.css({
+                    transform: `translateY(${length})`
+                });
+                return this;
+            },
+            children: function () {
+                return this.$handler.children();
+            }
+        }
+
+        let SlideContainer = function (options) {
+            this.$options = $.extend({}, this.DEFAULTS, options);
+            this.$handler = $(this.$options['handler']);
+            this.$sidebar = new SlidePanel(this.$options['sidebar'], this);
+            this.$mainSlide = new SlidePanel(this.$options['mainSlide'], this.$handler);
+            slidesCount = this.$mainSlide.children().length;
+            this.$sidebar.css('top', `-${(slidesCount - 1) * 100}vh`);
+            this.controls = new SlideControl(this.$options['controls'], this);
+            this.controls.on('control:handler', $.proxy(this.handler, this))
+        }
+
+        SlideContainer.prototype = {
+            DEFAULTS: {
+                handler: '.container',
+                sidebar: {
+                    handler: '.sidebar'
+                },
+                mainSlide: {
+                    handler: '.main-slide'
+                },
+            },
+            height: function () {
+                return this.$handler.height();
+            },
+            handler: function () {
+                this.$sidebar.transform(`${activeSlideIndex * this.height()}px`);
+                this.$mainSlide.transform(`-${activeSlideIndex * this.height()}px`);
+            }
+        }
 
         return {
             DEFAULTS: {},
