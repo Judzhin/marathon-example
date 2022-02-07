@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="stylesheet" href="styles.css"/>
+    <title>Доска | Проект 4</title>
+</head>
+<body>
+<div class="container" id="board"></div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+<script>
+    const Board = (function ($) {
+        const defaultOptions = {};
+
+        const BorderSquare = function (options) {
+            this.$options = $.extend({}, this.DEFAULTS, options);
+            this.$handler = $('<div>');
+            this.$handler.addClass('square');
+            this.initComponent()
+        };
+
+        BorderSquare.prototype = {
+            DEFAULTS: {
+                defaultColor: '#1d1d1d',
+                colors: ['#e74c3c', '#8e44ad', '#3498db', '#e67e22', '#2ecc71']
+            },
+            initComponent: function () {
+                this.$handler.on({
+                    mouseover: $.proxy(this.onMouseOver, this),
+                    mouseleave: $.proxy(this.onMouseLeave, this),
+                })
+            },
+            setColor: function (backgroundColor, boxShadow) {
+                this.$handler.css('backgroundColor', backgroundColor);
+                this.$handler.css('boxShadow', boxShadow);
+            },
+            onMouseOver: function () {
+                const index = Math.floor(Math.random() * this.$options['colors'].length),
+                    color = this.$options['colors'][index];
+                // this.$handler.css('backgroundColor', color);
+                // this.$handler.css('boxShadow', `0 0 2px ${color}, 0 0 10px ${color}`);
+                this.setColor(color, `0 0 2px ${color}, 0 0 10px ${color}`)
+            },
+            onMouseLeave: function () {
+                // this.$handler.css('backgroundColor', this.$options['defaultColor'])
+                // this.$handler.css('boxShadow', `0 0 2px #000`);
+                this.setColor(this.$options['defaultColor'], `0 0 2px #000`)
+            }
+        }
+
+        return {
+            DEFAULTS: {
+                SQUARES_NUMBERS: 500
+            },
+
+            /**
+             *
+             * @param options
+             */
+            ready: function (options) {
+                this.$options = $.extend(defaultOptions, this.DEFAULTS, options);
+                this.$handler = $(this.$options['handler']);
+                for (let i = 0; i < this.$options['SQUARES_NUMBERS']; i++) {
+                    this.add(new BorderSquare(this.$options['square']))
+                }
+            },
+            add: function (borderSquare) {
+                this.$handler.append(borderSquare.$handler);
+                return this;
+            }
+        }
+    }).call(this, jQuery);
+
+    Board.ready({
+        handler: '#board',
+        SQUARES_NUMBERS: 1000,
+        square: {
+            colors: [
+                '#e57373', '#f06292', '#ba68c8', '#9575cd', '#7986cb',
+                '#64b5f6', '#4fc3f7', '#4dd0e1', '#4db6ac', '#81c784',
+                '#aed581', '#dce775', '#fff176', '#ffd54f', '#ffb74d',
+                '#ff8a65', '#a1887f', '#e0e0e0', '#b0bec5',
+            ]
+        }
+    })
+</script>
+</body>
+</html>
