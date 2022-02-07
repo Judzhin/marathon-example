@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="stylesheet" href="styles.css"/>
+    <title>Aim Training | Project 5</title>
+</head>
+<body>
+
+<div class="screen">
+    <h1>Aim Training</h1>
+    <a href="#" class="start">Начать игру</a>
+</div>
+
+<div class="screen">
+    <h1>Выберите время</h1>
+    <ul class="time-list">
+        <li>
+            <button class="time-btn" data-time="10">
+                10 сек
+            </button>
+        </li>
+        <li>
+            <button class="time-btn" data-time="20">
+                20 сек
+            </button>
+        </li>
+        <li>
+            <button class="time-btn" data-time="30">
+                30 сек
+            </button>
+        </li>
+        <li>
+            <button class="time-btn" data-time="60">
+                60 сек
+            </button>
+        </li>
+        <li>
+            <button class="time-btn" data-time="120">
+                120 сек
+            </button>
+        </li>
+        <li>
+            <button class="time-btn" data-time="240">
+                240 сек
+            </button>
+        </li>
+    </ul>
+</div>
+
+<div id="aim" class="screen">
+    <h3>Осталось <span id="time">00:00</span></h3>
+    <div class="board" id="board"></div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(function () {
+        let $screen = $('.screen'), $time = $('#time'), time = 0, $board = $('#board'), score = 0;
+
+        $('.start').on('click', function (e) {
+            e.preventDefault();
+            $screen.has(e.target).addClass('up');
+        });
+
+        const applyTime = function (value) {
+            let minutes = Math.floor(value / 60);
+            minutes = minutes < 10 ? `0${minutes}` : minutes;
+            let seconds = value - (minutes * 60);
+            $time.html(`${minutes}:${seconds < 10 ? `0${seconds}` : seconds}`);
+        }
+
+        const generateNumber = function (min, max) {
+            return Math.round(Math.random() * (max - min) + min);
+        }
+
+        const randomColor = function () {
+            const colors = [
+                '#e57373', '#f06292', '#ba68c8', '#9575cd', '#7986cb',
+                '#64b5f6', '#4fc3f7', '#4dd0e1', '#4db6ac', '#81c784',
+                '#aed581', '#dce775', '#fff176', '#ffd54f', '#ffb74d',
+                '#ff8a65', '#a1887f', '#e0e0e0', '#b0bec5',
+            ];
+            return colors[generateNumber(0, colors.length - 1)];
+        };
+
+        const factoryCircle = function () {
+            let size = generateNumber(10, 60),
+                $circle = $('<div>');
+
+            $circle.addClass('circle').css({
+                width: size,
+                height: size,
+                top: generateNumber(0, $board.height() - size),
+                left: generateNumber(0, $board.width() - size),
+                background: randomColor()
+            });
+
+            $circle.on('click', function () {
+                ++score;
+                $circle.remove();
+                factoryCircle();
+            })
+
+            $board.append($circle);
+
+            setInterval(function () {
+                if (time < 1) {
+                    $circle.remove();
+                }
+            }, 100);
+        }
+
+        $('.time-list').delegate('.time-btn', 'click', function (e) {
+            let $current = $(this);
+            $screen.has($current).addClass('up');
+            applyTime(time = parseInt($current.attr('data-time')));
+            setInterval(function () {
+                if (--time > 0) {
+                    applyTime(time);
+                } else {
+                    $time.parent('h3').hide();
+                    $board.html(`<h1>Ваш счёт: <span class="primary">${score}</span></h1>`)
+                }
+            }, 1000);
+            factoryCircle();
+        });
+    });
+</script>
+</body>
+</html>
