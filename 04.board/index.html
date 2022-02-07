@@ -33,8 +33,12 @@
                 })
             },
             setColor: function (backgroundColor, boxShadow) {
-                this.$handler.css('backgroundColor', backgroundColor);
-                this.$handler.css('boxShadow', boxShadow);
+                if ($.isPlainObject(backgroundColor)) {
+                    this.$handler.css(backgroundColor);
+                } else {
+                    this.$handler.css('backgroundColor', backgroundColor);
+                    this.$handler.css('boxShadow', boxShadow);
+                }
             },
             onMouseOver: function () {
                 const index = Math.floor(Math.random() * this.$options['colors'].length),
@@ -46,13 +50,17 @@
             onMouseLeave: function () {
                 // this.$handler.css('backgroundColor', this.$options['defaultColor'])
                 // this.$handler.css('boxShadow', `0 0 2px #000`);
-                this.setColor(this.$options['defaultColor'], `0 0 2px #000`)
+                this.setColor({
+                    backgroundColor: this.$options['defaultColor'],
+                    boxShadow: `0 0 2px #000`
+                })
             }
         }
 
         return {
             DEFAULTS: {
-                SQUARES_NUMBERS: 500
+                handler: null,
+                NUMBER_OF_SQUARES: 500
             },
 
             /**
@@ -62,7 +70,7 @@
             ready: function (options) {
                 this.$options = $.extend(defaultOptions, this.DEFAULTS, options);
                 this.$handler = $(this.$options['handler']);
-                for (let i = 0; i < this.$options['SQUARES_NUMBERS']; i++) {
+                for (let i = 0; i < this.$options['NUMBER_OF_SQUARES']; i++) {
                     this.add(new BorderSquare(this.$options['square']))
                 }
             },
@@ -75,7 +83,7 @@
 
     Board.ready({
         handler: '#board',
-        SQUARES_NUMBERS: 1000,
+        NUMBER_OF_SQUARES: 1000,
         square: {
             colors: [
                 '#e57373', '#f06292', '#ba68c8', '#9575cd', '#7986cb',
