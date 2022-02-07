@@ -45,12 +45,12 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"
         integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
 <script>
-    let Slider = (function ($) {
+    const Slider = (function ($) {
         let defaultOptions = {},
             slidesCount = 0,
             activeSlideIndex = 0;
 
-        let SlideControl = function (options, context) {
+        const SlideControl = function (options, context) {
             this.$event = $(this);
             this.$options = $.extend({}, this.DEFAULTS, options);
             this.$downControl = $(this.$options['down']['handler'], context.$handler);
@@ -91,7 +91,7 @@
             },
         };
 
-        let SlidePanel = function (options, context) {
+        const SlidePanel = function (options, context) {
             this.$options = $.extend({}, this.DEFAULTS, options);
             this.$handler = $(this.$options['handler'], context.$handler);
         }
@@ -111,7 +111,7 @@
             }
         }
 
-        let SlideContainer = function (options) {
+        const SlideContainer = function (options) {
             this.$options = $.extend({}, this.DEFAULTS, options);
             this.$handler = $(this.$options['handler']);
             this.$sidebar = new SlidePanel(this.$options['sidebar'], this);
